@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thomas Pozo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #080808;
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(8,8,8,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.38);
+      text-decoration: none;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #fff; }
+
+    /* ── WORK / CAROUSEL SECTION ─────────────────────── */
+    #work {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #blur-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(8,8,8,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.75s ease;
+    }
+
+    #blur-overlay.revealed {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .click-hint {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 58px;
+      letter-spacing: 7px;
+      color: #fff;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .click-sub {
+      margin-top: 14px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .ripple-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.55);
+      transform: scale(0);
+      pointer-events: none;
+      animation: ripple-out 0.85s ease-out forwards;
+    }
+
+    @keyframes ripple-out {
+      to { transform: scale(1); opacity: 0; }
+    }
+
+    #feed-wrapper {
+      position: absolute;
+      inset: 0;
+      padding-top: 62px;
+      overflow: hidden;
+    }
+
+    #feed-track {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      animation: scroll-left 52s linear infinite;
+      will-change: transform;
+      height: 100%;
+    }
+
+    #feed-track.paused { animation-play-state: paused; }
+
+    @keyframes scroll-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .feed-card {
+      position: relative;
+      flex-shrink: 0;
+      width: 200px;
+      height: 100%;
+      overflow: hidden;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+
+    .feed-card .thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(50%) brightness(0.55);
+      transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), filter 0.45s;
+      display: block;
+      pointer-events: none;
+    }
+
+    .feed-card:hover .thumb {
+      transform: scale(1.06);
+      filter: grayscale(10%) brightness(0.7);
+    }
+
+    .feed-card .card-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 16px 18px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.9) 60%);
+    }
+
+    .feed-card .card-tag {
+      font-size: 8px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 5px;
+    }
+
+    .feed-card .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 1px;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .feed-card.wide { width: 420px; }
+
+    /* ── ABOUT SECTION ───────────────────────────────── */
+    #about {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 72px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1100px;
+    }
+
+    .about-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 105px);
+      line-height: 0.9;
+      color: #fff;
+    }
+
+    .about-body {
+      font-size: 16px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.85;
+    }
+
+    .about-body + .about-body { margin-top: 18px; }
+
+    /* ── CONTACT SECTION ─────────────────────────────── */
+    #contact {
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 72px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .contact-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 13vw, 160px);
+      line-height: 0.84;
+      color: #fff;
+      margin-bottom: 52px;
+    }
+
+    .c-links {
+      display: flex;
+      flex-direction: column;
+      max-width: 460px;
+    }
+
+    .c-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 300;
+      transition: opacity 0.15s;
+    }
+
+    .c-link:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
+    .c-link:hover { opacity: 0.4; }
+    .c-link span { opacity: 0.25; font-size: 18px; }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      padding: 24px 72px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.18);
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 768px) {
+      #about { padding: 80px 28px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      #contact { padding: 80px 28px; }
+      footer { padding: 20px 28px; flex-direction: column; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#work">Thomas Pozo</a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- WORK / CAROUSEL -->
+  <section id="work">
+
+    <div id="blur-overlay">
+      <div class="click-hint">Thomas Pozo</div>
+      <div class="click-sub">Click anywhere to enter</div>
+    </div>
+
+    <div id="feed-wrapper">
+      <div id="feed-track">
+
+        <!-- SET 1 -->
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/raul-rosas.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Raul Rosas Jr</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/p4p-rankings.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">P4P Rankings</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/alex-perez.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Alex Perez</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/dat-boi-doc.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Documentary</div><div class="card-title">Dat Boi</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/robert-valentin.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Robert Valentin</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/ilia-topuria.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Ilia Topuria</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/homeland.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Homeland</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/flea-market.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Journalism</div><div class="card-title">Flea Market</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/bekhzod-usmonov.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Bekhzod Usmonov</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/omran-chaaban.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Omran Chaaban</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai-wok.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai Wok</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ai/christmas-helios-reel.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">AI Content</div><div class="card-title">Helios Reel</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/branded/northern-stallion-ad.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Branded</div><div class="card-title">Northern Stallion</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/mama-yai-curry.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Mama Yai's Curry</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/mbta-package.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">News</div><div class="card-title">MBTA Package</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/summer-athletes.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Sports</div><div class="card-title">Summer Athletes</div></div>
+        </div>
+
+        <!-- SET 2 (duplicate for seamless loop) -->
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/raul-rosas.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Raul Rosas Jr</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/p4p-rankings.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">P4P Rankings</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/alex-perez.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Alex Perez</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/dat-boi-doc.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Documentary</div><div class="card-title">Dat Boi</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/robert-valentin.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Robert Valentin</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/ilia-topuria.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Ilia Topuria</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/homeland.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Homeland</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/flea-market.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Journalism</div><div class="card-title">Flea Market</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/bekhzod-usmonov.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Bekhzod Usmonov</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/omran-chaaban.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Omran Chaaban</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai-wok.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai Wok</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/ai/christmas-helios-reel.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">AI Content</div><div class="card-title">Helios Reel</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/branded/northern-stallion-ad.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Branded</div><div class="card-title">Northern Stallion</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai</div></div>
+        </div>
+        <div class="feed-card">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/mama-yai-curry.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Mama Yai's Curry</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/mbta-package.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">News</div><div class="card-title">MBTA Package</div></div>
+        </div>
+        <div class="feed-card wide">
+          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/summer-athletes.mp4" type="video/mp4"></video>
+          <div class="card-info"><div class="card-tag">Sports</div><div class="card-title">Summer Athletes</div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-big">Driven.<br>Versatile.<br>Story-<br>Focused.</div>
+      <div>
+        <p class="about-body">Fourth-year journalism student-athlete specializing in broadcast storytelling. On-camera reporter with full production capability — research, shooting, writing, and editing, start to finish.</p>
+        <p class="about-body">Outside the newsroom, built @BallsDeepUFC from zero — the same instinct for raw, honest storytelling, just a different arena.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-big">Let's<br>Talk.</div>
+    <div class="c-links">
+      <a class="c-link" href="mailto:tppozo27@gmail.com">tppozo27@gmail.com <span>→</span></a>
+      <a class="c-link" href="https://www.linkedin.com/in/thomas-pozo-8475532b1" target="_blank" rel="noopener">LinkedIn <span>→</span></a>
+      <a class="c-link" href="https://www.instagram.com/ballsdeepufc/" target="_blank" rel="noopener">@ballsdeepufc <span>→</span></a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Thomas Pozo</span>
+    <span>© 2026 · Broadcast Journalism</span>
+  </footer>
+
+  <script>
+    const overlay = document.getElementById('blur-overlay');
+    const track   = document.getElementById('feed-track');
+
+    overlay.addEventListener('click', function(e) {
+      const rect = overlay.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const maxR = Math.hypot(Math.max(x, rect.width - x), Math.max(y, rect.height - y));
+      const ring = document.createElement('div');
+      ring.className = 'ripple-ring';
+      const d = maxR * 2;
+      ring.style.cssText = `width:${d}px;height:${d}px;left:${x - maxR}px;top:${y - maxR}px;`;
+      overlay.appendChild(ring);
+      setTimeout(() => overlay.classList.add('revealed'), 130);
+      setTimeout(() => ring.remove(), 950);
+    });
+
+    document.querySelectorAll('.feed-card').forEach(card => {
+      card.addEventListener('mouseenter', () => track.classList.add('paused'));
+      card.addEventListener('mouseleave', () => track.classList.remove('paused'));
+    });
+  </script>
+
+</body>
+</html>
