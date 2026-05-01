@@ -156,6 +156,13 @@
       pointer-events: none;
     }
 
+    /* video elements used for local clips */
+    .feed-card video.thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .feed-card:hover .thumb {
       transform: scale(1.06);
       filter: grayscale(10%) brightness(0.7);
@@ -184,7 +191,74 @@
       line-height: 1.1;
     }
 
+    /* play icon shown on YouTube cards */
+    .feed-card .play-hint {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+
+    .feed-card .play-hint::after {
+      content: '';
+      width: 0; height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 13px solid rgba(255,255,255,0.7);
+      margin-left: 3px;
+    }
+
+    .feed-card:hover .play-hint { opacity: 1; }
+
     .feed-card.wide { width: 420px; }
+
+    /* ── VIDEO LIGHTBOX ──────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.92);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    #lightbox.open { display: flex; }
+
+    #lightbox-close {
+      position: absolute;
+      top: 24px; right: 32px;
+      font-size: 28px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s;
+      background: none; border: none;
+    }
+
+    #lightbox-close:hover { color: #fff; }
+
+    #lightbox iframe {
+      width: min(90vw, 1100px);
+      aspect-ratio: 16/9;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #lightbox-title {
+      margin-top: 18px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.55);
+    }
 
     /* ── ABOUT SECTION ───────────────────────────────── */
     #about {
@@ -303,149 +377,116 @@
     <div id="feed-wrapper">
       <div id="feed-track">
 
+        <!--
+          HOW TO ADD A CARD:
+          ─────────────────────────────────────────────────────────────────
+          YouTube video  →  data-yt="VIDEO_ID"  (e.g. data-yt="dQw4w9WgXcQ")
+                            thumb = YouTube's auto thumbnail (no upload needed)
+                            clicking opens the lightbox player
+          Local MP4      →  data-src="videos/folder/file.mp4"
+                            thumb = the video itself (must be <100 MB for GitHub)
+          ─────────────────────────────────────────────────────────────────
+        -->
+
         <!-- SET 1 -->
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/raul-rosas.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Raul Rosas Jr">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Raul Rosas Jr"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Raul Rosas Jr</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/p4p-rankings.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="P4P Rankings">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="P4P Rankings"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">P4P Rankings</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/alex-perez.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Alex Perez">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Alex Perez"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Alex Perez</div></div>
         </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/dat-boi-doc.mp4" type="video/mp4"></video>
+        <div class="feed-card wide" data-yt="REPLACE_ME" data-title="Dat Boi">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Dat Boi"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Documentary</div><div class="card-title">Dat Boi</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/robert-valentin.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Robert Valentin">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Robert Valentin"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Robert Valentin</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/ilia-topuria.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Ilia Topuria">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Ilia Topuria"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Ilia Topuria</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/homeland.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Homeland">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Homeland"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Homeland</div></div>
         </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/flea-market.mp4" type="video/mp4"></video>
+        <div class="feed-card wide" data-yt="REPLACE_ME" data-title="Flea Market">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Flea Market"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Journalism</div><div class="card-title">Flea Market</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/bekhzod-usmonov.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Bekhzod Usmonov">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Bekhzod Usmonov"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Bekhzod Usmonov</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/omran-chaaban.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Omran Chaaban">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Omran Chaaban"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Omran Chaaban</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai-wok.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Rod Thai Wok">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Rod Thai Wok"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai Wok</div></div>
         </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ai/christmas-helios-reel.mp4" type="video/mp4"></video>
+        <div class="feed-card wide" data-yt="REPLACE_ME" data-title="Helios Reel">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Helios Reel"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">AI Content</div><div class="card-title">Helios Reel</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/branded/northern-stallion-ad.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Northern Stallion">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Northern Stallion"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Branded</div><div class="card-title">Northern Stallion</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Rod Thai">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Rod Thai"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai</div></div>
         </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/mama-yai-curry.mp4" type="video/mp4"></video>
+        <div class="feed-card" data-yt="REPLACE_ME" data-title="Mama Yai's Curry">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Mama Yai's Curry"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Mama Yai's Curry</div></div>
         </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/mbta-package.mp4" type="video/mp4"></video>
+        <div class="feed-card wide" data-yt="REPLACE_ME" data-title="MBTA Package">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="MBTA Package"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">News</div><div class="card-title">MBTA Package</div></div>
         </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/summer-athletes.mp4" type="video/mp4"></video>
+        <div class="feed-card wide" data-yt="REPLACE_ME" data-title="Summer Athletes">
+          <img class="thumb" src="https://img.youtube.com/vi/REPLACE_ME/maxresdefault.jpg" alt="Summer Athletes"/>
+          <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Sports</div><div class="card-title">Summer Athletes</div></div>
         </div>
 
-        <!-- SET 2 (duplicate for seamless loop) -->
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/raul-rosas.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Raul Rosas Jr</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/p4p-rankings.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">P4P Rankings</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/alex-perez.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Alex Perez</div></div>
-        </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/dat-boi-doc.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Documentary</div><div class="card-title">Dat Boi</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/robert-valentin.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Robert Valentin</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/ilia-topuria.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Ilia Topuria</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/homeland.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Homeland</div></div>
-        </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/flea-market.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Journalism</div><div class="card-title">Flea Market</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/bekhzod-usmonov.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Bekhzod Usmonov</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ufc/omran-chaaban.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">UFC / Social</div><div class="card-title">Omran Chaaban</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai-wok.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai Wok</div></div>
-        </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/ai/christmas-helios-reel.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">AI Content</div><div class="card-title">Helios Reel</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/branded/northern-stallion-ad.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Branded</div><div class="card-title">Northern Stallion</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/rod-thai.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai</div></div>
-        </div>
-        <div class="feed-card">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/food/mama-yai-curry.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Mama Yai's Curry</div></div>
-        </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/mbta-package.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">News</div><div class="card-title">MBTA Package</div></div>
-        </div>
-        <div class="feed-card wide">
-          <video class="thumb" autoplay muted loop playsinline><source src="videos/journalism/summer-athletes.mp4" type="video/mp4"></video>
-          <div class="card-info"><div class="card-tag">Sports</div><div class="card-title">Summer Athletes</div></div>
-        </div>
+        <!-- SET 2 — exact duplicate of Set 1 for seamless CSS loop (JS clones these) -->
 
       </div>
     </div>
   </section>
+
+  <!-- VIDEO LIGHTBOX -->
+  <div id="lightbox">
+    <button id="lightbox-close">✕</button>
+    <iframe id="lightbox-frame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <div id="lightbox-title"></div>
+  </div>
 
   <!-- ABOUT -->
   <section id="about">
@@ -474,9 +515,8 @@
   </footer>
 
   <script>
+    // ── Blur overlay reveal ──────────────────────────────────────
     const overlay = document.getElementById('blur-overlay');
-    const track   = document.getElementById('feed-track');
-
     overlay.addEventListener('click', function(e) {
       const rect = overlay.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -491,9 +531,45 @@
       setTimeout(() => ring.remove(), 950);
     });
 
-    document.querySelectorAll('.feed-card').forEach(card => {
-      card.addEventListener('mouseenter', () => track.classList.add('paused'));
-      card.addEventListener('mouseleave', () => track.classList.remove('paused'));
+    // ── Seamless loop: clone Set 1 as Set 2 ─────────────────────
+    const track = document.getElementById('feed-track');
+    const origCards = Array.from(track.children);
+    origCards.forEach(card => track.appendChild(card.cloneNode(true)));
+
+    // ── Pause on hover ───────────────────────────────────────────
+    track.addEventListener('mouseenter', () => track.classList.add('paused'), true);
+    track.addEventListener('mouseleave', () => track.classList.remove('paused'), true);
+
+    // ── Lightbox ─────────────────────────────────────────────────
+    const lightbox      = document.getElementById('lightbox');
+    const lbFrame       = document.getElementById('lightbox-frame');
+    const lbTitle       = document.getElementById('lightbox-title');
+    const lbClose       = document.getElementById('lightbox-close');
+
+    function openLightbox(ytId, title) {
+      lbFrame.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+      lbTitle.textContent = title;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lbFrame.src = '';
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    // Attach click to all cards that have a YouTube ID
+    document.querySelectorAll('.feed-card[data-yt]').forEach(card => {
+      card.addEventListener('click', () => {
+        const ytId  = card.dataset.yt;
+        const title = card.dataset.title || '';
+        if (ytId && ytId !== 'REPLACE_ME') openLightbox(ytId, title);
+      });
     });
   </script>
 
