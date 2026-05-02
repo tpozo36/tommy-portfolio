@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Thomas Pozo</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Preload first carousel videos (immediately visible on load) -->
+  <link rel="preload" as="video" href="videos/ufc/raul-rosas.mp4" type="video/mp4">
+  <link rel="preload" as="video" href="videos/ufc/p4p-rankings.mp4" type="video/mp4">
+  <link rel="preload" as="video" href="videos/ufc/alex-perez.mp4" type="video/mp4">
+  <!-- Preload heaviest video assets -->
+  <link rel="preload" as="video" href="videos/branded/northern-stallion-ad.mp4" type="video/mp4">
+  <link rel="preload" as="video" href="videos/ai/christmas-helios-reel.mp4" type="video/mp4">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -67,20 +74,14 @@
       position: absolute;
       inset: 0;
       z-index: 10;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      background: rgba(8,8,8,0.5);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      background: rgba(8,8,8,0.65);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: opacity 0.75s ease;
-    }
-
-    #blur-overlay.revealed {
-      opacity: 0;
-      pointer-events: none;
     }
 
     .click-hint {
@@ -103,14 +104,17 @@
     .ripple-ring {
       position: absolute;
       border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.55);
+      border: 2px solid rgba(255,255,255,0.75);
+      box-shadow: 0 0 24px rgba(255,255,255,0.25), inset 0 0 16px rgba(255,255,255,0.08);
       transform: scale(0);
       pointer-events: none;
-      animation: ripple-out 0.85s ease-out forwards;
+      animation: ripple-out 0.82s cubic-bezier(0.2, 0, 0.35, 1) forwards;
     }
 
     @keyframes ripple-out {
-      to { transform: scale(1); opacity: 0; }
+      0%   { transform: scale(0); opacity: 0.95; }
+      65%  { opacity: 0.55; }
+      100% { transform: scale(1); opacity: 0; }
     }
 
     #feed-wrapper {
@@ -456,7 +460,7 @@
 
         <!-- YOUTUBE: Dat Boi documentary -->
         <div class="feed-card wide" data-yt="DtjWcCUQhTw" data-title="Dat Boi">
-          <img class="thumb" src="https://img.youtube.com/vi/DtjWcCUQhTw/maxresdefault.jpg" alt="Dat Boi"/>
+          <img class="thumb" src="https://img.youtube.com/vi/DtjWcCUQhTw/maxresdefault.jpg" alt="Dat Boi" loading="eager" fetchpriority="high"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Documentary</div><div class="card-title">Dat Boi</div></div>
         </div>
@@ -482,7 +486,7 @@
 
         <!-- YOUTUBE: Flea Market -->
         <div class="feed-card wide" data-yt="6YZIfM7ooMY" data-title="Flea Market">
-          <img class="thumb" src="https://img.youtube.com/vi/6YZIfM7ooMY/maxresdefault.jpg" alt="Flea Market"/>
+          <img class="thumb" src="https://img.youtube.com/vi/6YZIfM7ooMY/maxresdefault.jpg" alt="Flea Market" loading="eager" fetchpriority="high"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Journalism</div><div class="card-title">Flea Market</div></div>
         </div>
@@ -501,7 +505,7 @@
 
         <!-- YOUTUBE: Rod Thai Wok -->
         <div class="feed-card" data-yt="LRgXkDU0PbM" data-title="Rod Thai Wok">
-          <img class="thumb" src="https://img.youtube.com/vi/LRgXkDU0PbM/maxresdefault.jpg" alt="Rod Thai Wok"/>
+          <img class="thumb" src="https://img.youtube.com/vi/LRgXkDU0PbM/maxresdefault.jpg" alt="Rod Thai Wok" loading="lazy"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Food</div><div class="card-title">Rod Thai Wok</div></div>
         </div>
@@ -534,21 +538,21 @@
 
         <!-- YOUTUBE: MBTA Story -->
         <div class="feed-card wide" data-yt="qUoIBVVKqkE" data-title="MBTA Story">
-          <img class="thumb" src="https://img.youtube.com/vi/qUoIBVVKqkE/maxresdefault.jpg" alt="MBTA Story"/>
+          <img class="thumb" src="https://img.youtube.com/vi/qUoIBVVKqkE/maxresdefault.jpg" alt="MBTA Story" loading="lazy"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">News</div><div class="card-title">MBTA Story</div></div>
         </div>
 
         <!-- YOUTUBE: Off-Season Training -->
         <div class="feed-card wide" data-yt="Gz388XqP01s" data-title="Off-Season Training">
-          <img class="thumb" src="https://img.youtube.com/vi/Gz388XqP01s/maxresdefault.jpg" alt="Off-Season Training"/>
+          <img class="thumb" src="https://img.youtube.com/vi/Gz388XqP01s/maxresdefault.jpg" alt="Off-Season Training" loading="lazy"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">Sports</div><div class="card-title">Off-Season Training</div></div>
         </div>
 
         <!-- YOUTUBE: New Story -->
         <div class="feed-card" data-yt="IMueCxabzKg" data-title="New Story">
-          <img class="thumb" src="https://img.youtube.com/vi/IMueCxabzKg/maxresdefault.jpg" alt="New Story"/>
+          <img class="thumb" src="https://img.youtube.com/vi/IMueCxabzKg/maxresdefault.jpg" alt="New Story" loading="lazy"/>
           <div class="play-hint"></div>
           <div class="card-info"><div class="card-tag">News</div><div class="card-title">New Story</div></div>
         </div>
@@ -613,20 +617,44 @@
   </footer>
 
   <script>
-    // ── Blur overlay reveal ──────────────────────────────────────
+    // ── Blur overlay reveal — inside-out ripple wipe ────────────
     const overlay = document.getElementById('blur-overlay');
     overlay.addEventListener('click', function(e) {
       const rect = overlay.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const maxR = Math.hypot(Math.max(x, rect.width - x), Math.max(y, rect.height - y));
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      // maxR: distance from click to farthest corner, plus small buffer
+      const maxR = Math.hypot(Math.max(cx, rect.width - cx), Math.max(cy, rect.height - cy)) + 80;
+
+      // Visual ring that rides the expanding blur edge
       const ring = document.createElement('div');
       ring.className = 'ripple-ring';
       const d = maxR * 2;
-      ring.style.cssText = `width:${d}px;height:${d}px;left:${x - maxR}px;top:${y - maxR}px;`;
+      ring.style.cssText = `width:${d}px;height:${d}px;left:${cx - maxR}px;top:${cy - maxR}px;`;
       overlay.appendChild(ring);
-      setTimeout(() => overlay.classList.add('revealed'), 130);
-      setTimeout(() => ring.remove(), 950);
+      setTimeout(() => ring.remove(), 1000);
+
+      // rAF mask: transparent circle grows from click point, wiping blur outward
+      const duration = 800;
+      const feather  = 60; // soft edge width in px
+      let startTs    = null;
+
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+      function animReveal(ts) {
+        if (startTs === null) startTs = ts;
+        const progress = Math.min(1, (ts - startTs) / duration);
+        const r    = easeOutCubic(progress) * maxR;
+        const mask = `radial-gradient(circle at ${cx}px ${cy}px, transparent 0%, transparent ${r}px, black ${r + feather}px, black 100%)`;
+        overlay.style.maskImage        = mask;
+        overlay.style.webkitMaskImage  = mask;
+        if (progress < 1) {
+          requestAnimationFrame(animReveal);
+        } else {
+          overlay.style.display = 'none';
+        }
+      }
+      requestAnimationFrame(animReveal);
     });
 
     // ── Carousel: rAF-driven, single source of truth ────────────
