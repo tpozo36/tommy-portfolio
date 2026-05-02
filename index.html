@@ -303,6 +303,54 @@
 
     .about-body + .about-body { margin-top: 18px; }
 
+    .about-label {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    .about-creds {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .about-creds li {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.5);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .about-creds li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,0.18);
+    }
+
+    .about-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .about-skill {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.32);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 5px 10px;
+    }
+
     /* ── CONTACT SECTION ─────────────────────────────── */
     #contact {
       min-height: 60vh;
@@ -524,8 +572,27 @@
     <div class="about-grid">
       <div class="about-big">Driven.<br>Versatile.<br>Story-<br>Focused.</div>
       <div>
-        <p class="about-body">Broadcast journalist and content creator with end-to-end production capability — on-camera, behind the lens, in the edit. Every story researched, shot, written, and cut to land.</p>
-        <p class="about-body">From long-form documentary to short-form social, the approach stays the same: find the real story, cut through the noise, and build content that connects with the audience that matters.</p>
+        <p class="about-body">Emmy Award-winning content creator and broadcast journalist based in Boston. Emerson College graduate with hands-on experience across TV newsrooms, social media, and digital storytelling — disciplined, adaptable, and story-obsessed.</p>
+        <p class="about-body">One-man-band by trade: pitched, written, filmed, edited, and delivered. From the field to the feed, every platform gets the same commitment to craft.</p>
+
+        <div class="about-label">Credentials</div>
+        <ul class="about-creds">
+          <li>5× NATAS Emmy Award Winner</li>
+          <li>Mike Wallace Memorial Scholarship Recipient</li>
+          <li>Production Intern — WSVN-7 Miami, Special Projects</li>
+          <li>Field Reporter — Campus Lens with WBZ-TV Boston</li>
+          <li>4-Year NCAA Division III Lacrosse Athlete</li>
+        </ul>
+
+        <div class="about-label">Skills</div>
+        <div class="about-skills">
+          <span class="about-skill">Adobe Premiere Pro</span>
+          <span class="about-skill">Broadcast Videography</span>
+          <span class="about-skill">Social Media Strategy</span>
+          <span class="about-skill">Script Writing</span>
+          <span class="about-skill">Podcast Production</span>
+          <span class="about-skill">On-Camera Reporting</span>
+        </div>
       </div>
     </div>
   </section>
