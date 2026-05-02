@@ -131,6 +131,10 @@
 
     #feed-track.paused { animation-play-state: paused; }
 
+    #feed-wrapper { cursor: grab; user-select: none; }
+    #feed-wrapper.is-dragging { cursor: grabbing; }
+    #feed-track, .feed-card { user-select: none; }
+
     @keyframes scroll-left {
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
@@ -520,8 +524,8 @@
     <div class="about-grid">
       <div class="about-big">Driven.<br>Versatile.<br>Story-<br>Focused.</div>
       <div>
-        <p class="about-body">Fourth-year journalism student-athlete specializing in broadcast storytelling. On-camera reporter with full production capability — research, shooting, writing, and editing, start to finish.</p>
-        <p class="about-body">Outside the newsroom, built @BallsDeepUFC from zero — the same instinct for raw, honest storytelling, just a different arena.</p>
+        <p class="about-body">Broadcast journalist and content creator with end-to-end production capability — on-camera, behind the lens, in the edit. Every story researched, shot, written, and cut to land.</p>
+        <p class="about-body">From long-form documentary to short-form social, the approach stays the same: find the real story, cut through the noise, and build content that connects with the audience that matters.</p>
       </div>
     </div>
   </section>
@@ -559,13 +563,83 @@
     });
 
     // ── Seamless loop: clone Set 1 as Set 2 ─────────────────────
-    const track = document.getElementById('feed-track');
-    const origCards = Array.from(track.children);
+    const track       = document.getElementById('feed-track');
+    const feedWrapper = document.getElementById('feed-wrapper');
+    const origCards   = Array.from(track.children);
     origCards.forEach(card => track.appendChild(card.cloneNode(true)));
 
-    // ── Pause on hover ───────────────────────────────────────────
-    track.addEventListener('mouseenter', () => track.classList.add('paused'), true);
-    track.addEventListener('mouseleave', () => track.classList.remove('paused'), true);
+    const ANIM_DURATION = 52; // must match CSS scroll-left duration
+
+    function getCurrentOffset() {
+      const matrix = new DOMMatrix(window.getComputedStyle(track).transform);
+      return matrix.m41;
+    }
+
+    function normalizeOffset(offset) {
+      const half = track.scrollWidth / 2;
+      let n = offset % -half;
+      if (n > 0) n -= half;
+      return n;
+    }
+
+    function resumeFrom(rawOffset) {
+      const half     = track.scrollWidth / 2;
+      const norm     = normalizeOffset(rawOffset);
+      const progress = Math.abs(norm) / half;
+      const delay    = -(progress * ANIM_DURATION);
+
+      track.style.animation = 'none';
+      track.style.transform = `translateX(${norm}px)`;
+      track.offsetHeight; // force reflow
+      track.style.transform = '';
+      track.style.animation = `scroll-left ${ANIM_DURATION}s ${delay}s linear infinite`;
+    }
+
+    // ── Click-drag scrubbing ─────────────────────────────────────
+    let isDragging   = false;
+    let dragStartX   = 0;
+    let dragOffset   = 0;
+    let liveOffset   = 0;
+
+    feedWrapper.addEventListener('mousedown', e => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragOffset = getCurrentOffset();
+      track.style.animation = 'none';
+      track.style.transform = `translateX(${dragOffset}px)`;
+      feedWrapper.classList.add('is-dragging');
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      liveOffset = dragOffset + (e.clientX - dragStartX);
+      track.style.transform = `translateX(${liveOffset}px)`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      feedWrapper.classList.remove('is-dragging');
+      resumeFrom(liveOffset);
+    });
+
+    // ── Mouse wheel / trackpad horizontal scroll ─────────────────
+    let wheelTimer;
+    feedWrapper.addEventListener('wheel', e => {
+      e.preventDefault();
+      const delta   = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+      const current = track.style.animation === 'none'
+        ? parseFloat(track.style.transform.replace(/[^-\d.]/g, '')) || 0
+        : getCurrentOffset();
+
+      liveOffset = current - delta;
+      track.style.animation = 'none';
+      track.style.transform = `translateX(${liveOffset}px)`;
+
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => resumeFrom(liveOffset), 900);
+    }, { passive: false });
 
     // ── Lightbox ─────────────────────────────────────────────────
     const lightbox  = document.getElementById('lightbox');
