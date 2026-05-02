@@ -629,83 +629,90 @@
       setTimeout(() => ring.remove(), 950);
     });
 
-    // ── Seamless loop: clone Set 1 as Set 2 ─────────────────────
+    // ── Carousel: rAF-driven, single source of truth ────────────
+    // CSS animation is replaced entirely by JS so there is no
+    // animation restart/delay calculation and therefore no snap.
     const track       = document.getElementById('feed-track');
     const feedWrapper = document.getElementById('feed-wrapper');
-    const origCards   = Array.from(track.children);
-    origCards.forEach(card => track.appendChild(card.cloneNode(true)));
 
-    const ANIM_DURATION = 52; // must match CSS scroll-left duration
+    // Clone Set 1 → Set 2 for seamless infinite loop
+    Array.from(track.children).forEach(c => track.appendChild(c.cloneNode(true)));
 
-    function getCurrentOffset() {
-      const matrix = new DOMMatrix(window.getComputedStyle(track).transform);
-      return matrix.m41;
+    // Kill the CSS animation — JS owns the transform from here
+    track.style.animation = 'none';
+
+    let offset      = 0;      // current translateX in px (single source of truth)
+    let interacting = false;  // true while user is dragging or wheeling
+    let isDragging  = false;
+    let dragStartX  = 0;
+    let dragBase    = 0;
+    let wheelTimer  = null;
+    let lastTs      = null;   // for time-based speed (avoids 60/120Hz variance)
+
+    function halfWidth() { return track.scrollWidth / 2; }
+
+    // Keep offset in (-halfWidth, 0] for the seamless loop
+    function wrapOffset(x) {
+      const h = halfWidth();
+      if (!h) return x;
+      x = x % -h;
+      if (x > 0) x -= h;
+      return x;
     }
 
-    function normalizeOffset(offset) {
-      const half = track.scrollWidth / 2;
-      let n = offset % -half;
-      if (n > 0) n -= half;
-      return n;
+    function tick(ts) {
+      const h = halfWidth();
+      if (!interacting && h > 0) {
+        if (lastTs !== null) {
+          // 52 000 ms to traverse one full set — same pace as the original CSS
+          const dt = Math.min(ts - lastTs, 50); // cap prevents tab-wake jumps
+          offset -= (h / 52000) * dt;
+          if (offset <= -h) offset += h;
+        }
+        lastTs = ts;
+      } else {
+        lastTs = null; // reset so first auto-scroll frame after interaction is clean
+      }
+      track.style.transform = `translateX(${offset}px)`;
+      requestAnimationFrame(tick);
     }
 
-    function resumeFrom(rawOffset) {
-      const half     = track.scrollWidth / 2;
-      const norm     = normalizeOffset(rawOffset);
-      const progress = Math.abs(norm) / half;
-      const delay    = -(progress * ANIM_DURATION);
+    requestAnimationFrame(tick);
 
-      track.style.animation = 'none';
-      track.style.transform = `translateX(${norm}px)`;
-      track.offsetHeight; // force reflow
-      track.style.transform = '';
-      track.style.animation = `scroll-left ${ANIM_DURATION}s ${delay}s linear infinite`;
-    }
-
-    // ── Click-drag scrubbing ─────────────────────────────────────
-    let isDragging   = false;
-    let dragStartX   = 0;
-    let dragOffset   = 0;
-    let liveOffset   = 0;
-
+    // ── Click-drag ───────────────────────────────────────────────
     feedWrapper.addEventListener('mousedown', e => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragOffset = getCurrentOffset();
-      track.style.animation = 'none';
-      track.style.transform = `translateX(${dragOffset}px)`;
+      isDragging  = true;
+      interacting = true;
+      dragStartX  = e.clientX;
+      dragBase    = offset;
       feedWrapper.classList.add('is-dragging');
       e.preventDefault();
     });
 
     document.addEventListener('mousemove', e => {
       if (!isDragging) return;
-      liveOffset = dragOffset + (e.clientX - dragStartX);
-      track.style.transform = `translateX(${liveOffset}px)`;
+      offset = dragBase + (e.clientX - dragStartX);
     });
 
     document.addEventListener('mouseup', () => {
       if (!isDragging) return;
-      isDragging = false;
+      isDragging  = false;
+      offset      = wrapOffset(offset); // normalize before handing back to rAF loop
+      interacting = false;
       feedWrapper.classList.remove('is-dragging');
-      resumeFrom(liveOffset);
     });
 
-    // ── Mouse wheel / trackpad horizontal scroll ─────────────────
-    let wheelTimer;
+    // ── Mouse wheel / trackpad ───────────────────────────────────
     feedWrapper.addEventListener('wheel', e => {
       e.preventDefault();
-      const delta   = e.deltaX !== 0 ? e.deltaX : e.deltaY;
-      const current = track.style.animation === 'none'
-        ? parseFloat(track.style.transform.replace(/[^-\d.]/g, '')) || 0
-        : getCurrentOffset();
-
-      liveOffset = current - delta;
-      track.style.animation = 'none';
-      track.style.transform = `translateX(${liveOffset}px)`;
-
+      interacting = true;
+      offset -= (e.deltaX !== 0 ? e.deltaX : e.deltaY);
       clearTimeout(wheelTimer);
-      wheelTimer = setTimeout(() => resumeFrom(liveOffset), 900);
+      wheelTimer = setTimeout(() => {
+        offset      = wrapOffset(offset);
+        interacting = false;
+        wheelTimer  = null;
+      }, 900);
     }, { passive: false });
 
     // ── Lightbox ─────────────────────────────────────────────────
