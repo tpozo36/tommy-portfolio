@@ -101,20 +101,21 @@
       color: rgba(255,255,255,0.3);
     }
 
+    #ripple-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 11;
+      pointer-events: none;
+    }
+
     .ripple-ring {
       position: absolute;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.75);
-      box-shadow: 0 0 24px rgba(255,255,255,0.25), inset 0 0 16px rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.85);
+      box-shadow: 0 0 32px rgba(255,255,255,0.35), inset 0 0 20px rgba(255,255,255,0.12);
       transform: scale(0);
       pointer-events: none;
-      animation: ripple-out 0.82s cubic-bezier(0.2, 0, 0.35, 1) forwards;
-    }
-
-    @keyframes ripple-out {
-      0%   { transform: scale(0); opacity: 0.95; }
-      65%  { opacity: 0.55; }
-      100% { transform: scale(1); opacity: 0; }
+      /* transform and opacity driven by JS rAF for pixel-perfect sync with mask */
     }
 
     #feed-wrapper {
@@ -436,6 +437,9 @@
       <div class="click-sub">Click anywhere to enter</div>
     </div>
 
+    <!-- Ring lives here, outside the masked overlay, so it renders unclipped -->
+    <div id="ripple-layer"></div>
+
     <div id="feed-wrapper">
       <div id="feed-track">
 
@@ -617,26 +621,27 @@
   </footer>
 
   <script>
-    // ── Blur overlay reveal — inside-out ripple wipe ────────────
-    const overlay = document.getElementById('blur-overlay');
+    // ── Blur overlay reveal — ring + inside-out blur wipe ───────
+    // Ring and mask share one rAF loop so they're pixel-perfect in sync:
+    // ring scale = r / maxR, mask transparent zone = 0..r, feather = r..r+55
+    const overlay     = document.getElementById('blur-overlay');
+    const rippleLayer = document.getElementById('ripple-layer');
+
     overlay.addEventListener('click', function(e) {
       const rect = overlay.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const cy = e.clientY - rect.top;
-      // maxR: distance from click to farthest corner, plus small buffer
+      const cx   = e.clientX - rect.left;
+      const cy   = e.clientY - rect.top;
       const maxR = Math.hypot(Math.max(cx, rect.width - cx), Math.max(cy, rect.height - cy)) + 80;
 
-      // Visual ring that rides the expanding blur edge
+      // Ring on its own unmasked layer — sized to maxR*2, centered on click
       const ring = document.createElement('div');
       ring.className = 'ripple-ring';
       const d = maxR * 2;
       ring.style.cssText = `width:${d}px;height:${d}px;left:${cx - maxR}px;top:${cy - maxR}px;`;
-      overlay.appendChild(ring);
-      setTimeout(() => ring.remove(), 1000);
+      rippleLayer.appendChild(ring);
 
-      // rAF mask: transparent circle grows from click point, wiping blur outward
-      const duration = 800;
-      const feather  = 60; // soft edge width in px
+      const duration = 820;
+      const feather  = 55;
       let startTs    = null;
 
       function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
@@ -644,14 +649,23 @@
       function animReveal(ts) {
         if (startTs === null) startTs = ts;
         const progress = Math.min(1, (ts - startTs) / duration);
-        const r    = easeOutCubic(progress) * maxR;
+        const r = easeOutCubic(progress) * maxR;
+
+        // Mask: inside ring = clear, outside ring = blurry, feather at boundary
         const mask = `radial-gradient(circle at ${cx}px ${cy}px, transparent 0%, transparent ${r}px, black ${r + feather}px, black 100%)`;
-        overlay.style.maskImage        = mask;
-        overlay.style.webkitMaskImage  = mask;
+        overlay.style.maskImage       = mask;
+        overlay.style.webkitMaskImage = mask;
+
+        // Ring scale = r / maxR so its edge is always at radius r (same as mask boundary)
+        ring.style.transform = `scale(${r / maxR})`;
+        // Full opacity for first 55% of animation, then fade out to end
+        ring.style.opacity = String(Math.max(0, 1 - Math.pow(Math.max(0, progress - 0.55) / 0.45, 2)));
+
         if (progress < 1) {
           requestAnimationFrame(animReveal);
         } else {
           overlay.style.display = 'none';
+          ring.remove();
         }
       }
       requestAnimationFrame(animReveal);
